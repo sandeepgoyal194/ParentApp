@@ -29,7 +29,7 @@ public class SplashActivity extends AppCompatActivity {
                 // Start your app main activity
                 AppBaseApplication.getApplication().initSession();
                 if (AppBaseApplication.getApplication().isUserLogin()) {
-                    Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                    Intent i = new Intent(SplashActivity.this, StopStudentAttendance.class);
                     startActivity(i);
                 } else {
                     Intent i = new Intent(SplashActivity.this, LoginActivity.class);

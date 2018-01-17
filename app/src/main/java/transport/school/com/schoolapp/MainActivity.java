@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import butterknife.BindView;
 import frameworks.basemvp.AppBaseActivity;
 import frameworks.basemvp.IPresenter;
+import transport.school.com.schoolapp.bean.Student;
 public class MainActivity extends AppBaseActivity {
     SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
@@ -22,7 +23,7 @@ public class MainActivity extends AppBaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mapFragment = new MapViewFragment();
+        mapFragment = MapViewFragment.newInstance((Student) getIntent().getSerializableExtra("student"));
         super.onCreate(savedInstanceState);
         loadFragments();
     }

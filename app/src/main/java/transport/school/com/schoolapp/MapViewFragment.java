@@ -209,8 +209,13 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
     }
 
     public void onLocationChanged(Location location) {
+        float bearing = 0.0f;
+        if(prevLocation != null ) {
+            bearing = prevLocation.bearingTo(location);
+        }
+        prevLocation = location;
         Locations locations = LocationManagerService.getInstance().getCurrentLocation();
-        setLocationOnMap(locations, location.getBearing());
+        setLocationOnMap(locations, bearing);
     }
 
     private BitmapDescriptor getCarMapIcon(int resourceId) {
@@ -219,14 +224,22 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         return BitmapDescriptorFactory.fromBitmap(resizedBitmap);
     }
 
+    Location prevLocation = null;
     Runnable locationCHanger = new Runnable() {
-        Route route;
+
 
         @Override
         public void run() {
+            Route route = new Route();
+            route.setRouteid(student.getRouteid());
             WebServicesWrapper.getInstance().getlocation(route, new ResponseResolver<LocationUpdateRequest>() {
                 @Override
                 public void onSuccess(LocationUpdateRequest locationUpdateRequest, Response response) {
+                    Location location = new Location("New Location");
+                    location.setLatitude(locationUpdateRequest.getLattitude());
+                    location.setLongitude(locationUpdateRequest.getLongitude());
+                    LocationManagerService.getInstance().setCurrentLocation(location);
+                    onLocationChanged(location);
                     h.postDelayed(locationCHanger,5000);
                 }
 
