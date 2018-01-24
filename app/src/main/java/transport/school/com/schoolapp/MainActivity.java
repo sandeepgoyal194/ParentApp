@@ -10,7 +10,10 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.List;
+
 import butterknife.BindView;
+import frameworks.appsession.AppBaseApplication;
 import frameworks.basemvp.AppBaseActivity;
 import frameworks.basemvp.IPresenter;
 import transport.school.com.schoolapp.bean.Student;
@@ -100,16 +103,23 @@ public class MainActivity extends AppBaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.endroute_menu, menu);
+        menu.clear();
+        List<Student> studentList = AppBaseApplication.getApplication().getStudents();
+        if(studentList.size()>1) {
+            for (int i = 0; i < studentList.size(); i++) {
+                Student student = studentList.get(i);
+                menu.add(0, i, i, student.getStudentname());
+            }
+        }
+        mapFragment.setStudent(AppBaseApplication.getApplication().getStudents().get(0));
+        setTitle(AppBaseApplication.getApplication().getStudents().get(0).getStudentname());
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.end_route:
-                return super.onOptionsItemSelected(item);
-            case R.id.logout:
-        }
+        mapFragment.setStudent(AppBaseApplication.getApplication().getStudents().get(item.getItemId()));
+        setTitle(AppBaseApplication.getApplication().getStudents().get(item.getItemId()).getStudentname());
         return true;
     }
 }

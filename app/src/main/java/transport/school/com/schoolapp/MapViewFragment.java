@@ -58,10 +58,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
     Handler h = new Handler();
 
     public static MapViewFragment newInstance(Student student) {
-        Bundle args = new Bundle();
-        args.putSerializable("student", student);
         MapViewFragment fragment = new MapViewFragment();
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -79,31 +76,34 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         } catch (Exception e) {
             e.printStackTrace();
         }
-        student = (Student) getArguments().getSerializable("student");
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
                 googleMap.setOnMarkerClickListener(MapViewFragment.this);
                 mMarkerOptions = null;
-                Stop stop = new Stop();
-                stop.setStopid(student.getStopid());
-                WebServicesWrapper.getInstance().getRoute(stop, new ResponseResolver<StopResponse>() {
-                    @Override
-                    public void onSuccess(StopResponse stopResponse, Response response) {
-                        List<Routestop> routestops = stopResponse.getRoutestops();
-                        drawRoute(routestops);
-                        h.postDelayed(locationCHanger,0);
-                    }
-
-                    @Override
-                    public void onFailure(RestError error, String msg) {
-                    }
-                });
 //                AppBaseApplication.getApplication().getSession().getTeacher().get(0).
             }
         });
         return rootView;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
+        Stop stop = new Stop();
+        stop.setStopid(student.getStopid());
+        WebServicesWrapper.getInstance().getRoute(stop, new ResponseResolver<StopResponse>() {
+            @Override
+            public void onSuccess(StopResponse stopResponse, Response response) {
+                List<Routestop> routestops = stopResponse.getRoutestops();
+                drawRoute(routestops);
+                h.postDelayed(locationCHanger,0);
+            }
+
+            @Override
+            public void onFailure(RestError error, String msg) {
+            }
+        });
     }
 
     public void drawRoute(final List<Routestop> list) {
