@@ -5,6 +5,9 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 @SuppressWarnings("unused")
 public class LoginResponse {
+
+    private String mobileNO;
+
     @SerializedName("error")
     private Boolean mError;
     @SerializedName("message")
@@ -13,6 +16,14 @@ public class LoginResponse {
     private List<Student> mStudents;
     @SerializedName("token")
     private String mToken;
+
+    public String getMobileNO() {
+        return mobileNO;
+    }
+
+    public void setMobileNO(String mobileNO) {
+        this.mobileNO = mobileNO;
+    }
 
     public Boolean getError() {
         return mError;

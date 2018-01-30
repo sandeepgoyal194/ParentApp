@@ -36,6 +36,50 @@
           "status": 2
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:693249103401:android:668f99d9cf747a7a",
+        "android_client_info": {
+          "package_name": "alpha.locateschoolbus.com.parent"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "693249103401-o808fcs553cqtraqejqced2hgrusig7g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "alpha.locateschoolbus.com.parent",
+            "certificate_hash": "2fb18fe7e1c3b82d783a252ba179427d20dd285d"
+          }
+        },
+        {
+          "client_id": "693249103401-go34iojk54c6rida8c0uosll5e75dbem.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpOSgLQXma36-72jzYUePq8mRQGqStBjM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "693249103401-go34iojk54c6rida8c0uosll5e75dbem.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
     }
   ],
   "configuration_version": "1"

@@ -19,6 +19,7 @@ import android.widget.Toast;
 import frameworks.appsession.AppBaseApplication;
 import frameworks.basemvp.AppBaseActivity;
 import frameworks.basemvp.IPresenter;
+import frameworks.messaging.MyFirebaseInstanceIDService;
 import frameworks.retrofit.ResponseResolver;
 import frameworks.retrofit.RestError;
 import frameworks.retrofit.WebServicesWrapper;
@@ -100,15 +101,18 @@ public class LoginActivity extends AppBaseActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            LoginRequest request = new LoginRequest();
+            final LoginRequest request = new LoginRequest();
             request.setMobile(email);
             request.setPassword(password);
             WebServicesWrapper.getInstance().login(request, new ResponseResolver<LoginResponse>() {
                 @Override
                 public void onSuccess(LoginResponse loginResponse, Response response) {
                     if (!loginResponse.getError()) {
+                        loginResponse.setMobileNO(request.getMobile());
                         AppBaseApplication.getApplication().setSession(loginResponse);
                         Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                        MyFirebaseInstanceIDService firebaseInstanceIDService = new MyFirebaseInstanceIDService();
+                        firebaseInstanceIDService.onTokenRefresh();
                         startActivity(i);
                         finish();
                     } else {
