@@ -38,7 +38,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
      * Persist token to third-party servers.
      *
      * Modify this method to associate the user's FCM InstanceID token with any server-side account
-     * maintained by your application.
+     * maintained by your application.ap
      *
      * @param token The new token.
      */
@@ -46,7 +46,9 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
         // TODO: Implement this method to send token to your app server.
         if(AppBaseApplication.getApplication().getSession() != null && AppBaseApplication.getApplication().getSession().getMobileNO() != null) {
             DeviceTokenRegister deviceTokenRegister = new DeviceTokenRegister();
-            deviceTokenRegister.setToken(token);
+            deviceTokenRegister.setToken(AppBaseApplication.getApplication().getSession().getmToken());
+            deviceTokenRegister.setUserDeviceId(token);
+            deviceTokenRegister.setUserDeviceType("Android");
             deviceTokenRegister.setMobile(AppBaseApplication.getApplication().getSession().getMobileNO());
             WebServicesWrapper.getInstance().postToken(deviceTokenRegister, new ResponseResolver<String>() {
                 @Override

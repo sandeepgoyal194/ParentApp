@@ -2,6 +2,7 @@ package frameworks.appsession;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.provider.Settings;
 
 import java.util.List;
 
@@ -9,7 +10,6 @@ import transport.school.com.schoolapp.LoginActivity;
 import transport.school.com.schoolapp.bean.LoginResponse;
 import transport.school.com.schoolapp.bean.Route;
 import transport.school.com.schoolapp.bean.Student;
-import transport.school.com.schoolapp.bean.Teacher;
 /**
  * Created by Sandeep on 21/01/2017.
  */
@@ -51,8 +51,6 @@ public class AppBaseApplication extends Application {
         return mAppSessionManager.getSession();
     }
 
-
-
     public void setSession(LoginResponse loginResponse) {
         mAppSessionManager.saveSession(loginResponse);
         mLoginResponse = loginResponse;
@@ -88,7 +86,7 @@ public class AppBaseApplication extends Application {
 
     private void clearUser() {
         mAppUserManager.clearUser();
-         mUser = null;
+        mUser = null;
     }
 
     private void clearSession() {
@@ -96,9 +94,12 @@ public class AppBaseApplication extends Application {
         mLoginResponse = null;
     }
 
-
     public List<Student> getStudents() {
-        return  getSession().getmStudents();
+        return getSession().getmStudents();
     }
 
+    public static String getDeviceID() {
+        return Settings.Secure.getString(getApplication().getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+    }
 }
