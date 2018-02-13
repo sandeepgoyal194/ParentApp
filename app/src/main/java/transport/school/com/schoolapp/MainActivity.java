@@ -112,14 +112,18 @@ public class MainActivity extends AppBaseActivity {
             }
         }
         mapFragment.setStudent(AppBaseApplication.getApplication().getStudents().get(0));
-        setTitle(AppBaseApplication.getApplication().getStudents().get(0).getStudentname());
+        setTitleValue(AppBaseApplication.getApplication().getStudents().get(0));
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         mapFragment.setStudent(AppBaseApplication.getApplication().getStudents().get(item.getItemId()));
-        setTitle(AppBaseApplication.getApplication().getStudents().get(item.getItemId()).getStudentname());
+        setTitleValue(AppBaseApplication.getApplication().getStudents().get(item.getItemId()));
         return true;
+    }
+
+    void setTitleValue(Student student) {
+        setTitle(student.getStudentname() +","+student.getSchoolname());
     }
 }

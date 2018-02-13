@@ -97,7 +97,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
             public void onSuccess(StopResponse stopResponse, Response response) {
                 List<Routestop> routestops = stopResponse.getRoutestops();
                 drawRoute(routestops);
-                h.postDelayed(locationCHanger,0);
+                h.postDelayed(locationCHanger, 0);
             }
 
             @Override
@@ -124,13 +124,26 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
                         int i = 0;
                         if (direction.isOK()) {
                             com.akexorcist.googledirection.model.Route route = direction.getRouteList().get(0);
-                            iconFactory.setColor(Color.GREEN);
-                            addIcon(iconFactory, list.get(i).getStopname(), list.get(i++).getStopid(), origin);
-                            iconFactory.setColor(Color.RED);
-                            addIcon(iconFactory, list.get(list.size() - 1).getStopname(), list.get(list.size() - 1).getStopid(), destination);
+                            if(student.getStopid() == list.get(i).getStopid()) {
+                                iconFactory.setColor(Color.GREEN);
+                                addIcon(iconFactory, list.get(i).getStopname(), list.get(i++).getStopid(), origin);
+                            }else {
+                                addMarker(BitmapDescriptorFactory.HUE_GREEN,origin);
+                                i++;
+                            }
+                            if(student.getStopid() == list.get(list.size() - 1).getStopid()) {
+                                iconFactory.setColor(Color.RED);
+                                addIcon(iconFactory, list.get(list.size() - 1).getStopname(), list.get(list.size() - 1).getStopid(), destination);
+                            }else  {
+                                addMarker(BitmapDescriptorFactory.HUE_RED,destination);
+                            }
                             for (LatLng position : latLngs.subList(1, list.size() - 1)) {
-                                iconFactory.setColor(Color.BLUE);
-                                addIcon(iconFactory, list.get(i).getStopname(), list.get(i++).getStopid(), position);
+                                if(student.getStopid() == list.get(i).getStopid()) {
+                                    iconFactory.setColor(Color.BLUE);
+                                    addIcon(iconFactory, list.get(i).getStopname(), list.get(i++).getStopid(), position);
+                                }else {
+                                    addMarker(BitmapDescriptorFactory.HUE_BLUE,destination);
+                                }
                             }
                             for (Leg leg : route.getLegList()) {
                                 //List<Step> stepList = leg.getStepList();
@@ -155,6 +168,10 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
                 position(position).
                 anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
         googleMap.addMarker(markerOptions).setTag(text);
+    }
+
+    private void addMarker(float color, LatLng destination) {
+        googleMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(color)).position(destination));
     }
 
     private void setCameraWithCoordinationBounds(com.akexorcist.googledirection.model.Route route) {
@@ -210,7 +227,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     public void onLocationChanged(Location location) {
         float bearing = 0.0f;
-        if(prevLocation != null ) {
+        if (prevLocation != null) {
             bearing = prevLocation.bearingTo(location);
         }
         prevLocation = location;
@@ -226,8 +243,6 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     Location prevLocation = null;
     Runnable locationCHanger = new Runnable() {
-
-
         @Override
         public void run() {
             Route route = new Route();
@@ -240,7 +255,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
                     location.setLongitude(locationUpdateRequest.getLongitude());
                     LocationManagerService.getInstance().setCurrentLocation(location);
                     onLocationChanged(location);
-                    h.postDelayed(locationCHanger,5000);
+                    h.postDelayed(locationCHanger, 5000);
                 }
 
                 @Override
