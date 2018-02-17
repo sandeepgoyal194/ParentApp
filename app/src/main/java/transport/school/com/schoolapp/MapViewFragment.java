@@ -88,6 +88,8 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         return rootView;
     }
 
+    List<Routestop> routestops;
+
     public void setStudent(Student student) {
         this.student = student;
         Stop stop = new Stop();
@@ -95,7 +97,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         WebServicesWrapper.getInstance().getRoute(stop, new ResponseResolver<StopResponse>() {
             @Override
             public void onSuccess(StopResponse stopResponse, Response response) {
-                List<Routestop> routestops = stopResponse.getRoutestops();
+                routestops = stopResponse.getRoutestops();
                 drawRoute(routestops);
                 h.postDelayed(locationCHanger, 0);
             }
@@ -111,7 +113,8 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         for (Routestop routestop : list) {
             latLngs.add(new LatLng(Double.parseDouble(routestop.getLatitude()), Double.parseDouble(routestop.getLongitude())));
         }
-        final LatLng origin = new LatLng(latLngs.get(0).latitude, latLngs.get(0).longitude);
+        Locations location = LocationManagerService.getInstance().getCurrentLocation();
+        final LatLng origin = location != null ? new LatLng(location.getLattitude(), location.getLongitude()) : new LatLng(latLngs.get(0).latitude, latLngs.get(0).longitude);
         final LatLng destination = new LatLng(latLngs.get(list.size() - 1).latitude, latLngs.get(list.size() - 1).longitude);
         GoogleDirection.withServerKey("AIzaSyAUmVRXx43uVLZomeU1tRR5OYYkGuW6bew")
                 .from(origin)
@@ -123,26 +126,27 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
                     public void onDirectionSuccess(Direction direction, String rawBody) {
                         int i = 0;
                         if (direction.isOK()) {
+                            LatLng origin = new LatLng(latLngs.get(0).latitude, latLngs.get(0).longitude);
                             com.akexorcist.googledirection.model.Route route = direction.getRouteList().get(0);
-                            if(student.getStopid() == list.get(i).getStopid()) {
+                            if (student.getStopid().equals(list.get(i).getStopid())) {
                                 iconFactory.setColor(Color.GREEN);
                                 addIcon(iconFactory, list.get(i).getStopname(), list.get(i++).getStopid(), origin);
-                            }else {
-                                addMarker(BitmapDescriptorFactory.HUE_GREEN,origin);
+                            } else {
+                                addMarker(BitmapDescriptorFactory.HUE_GREEN, origin);
                                 i++;
                             }
-                            if(student.getStopid() == list.get(list.size() - 1).getStopid()) {
+                            if (student.getStopid().equals(list.get(list.size() - 1).getStopid())) {
                                 iconFactory.setColor(Color.RED);
                                 addIcon(iconFactory, list.get(list.size() - 1).getStopname(), list.get(list.size() - 1).getStopid(), destination);
-                            }else  {
-                                addMarker(BitmapDescriptorFactory.HUE_RED,destination);
+                            } else {
+                                addMarker(BitmapDescriptorFactory.HUE_RED, destination);
                             }
                             for (LatLng position : latLngs.subList(1, list.size() - 1)) {
-                                if(student.getStopid() == list.get(i).getStopid()) {
+                                if (student.getStopid().equals(list.get(i).getStopid())) {
                                     iconFactory.setColor(Color.BLUE);
                                     addIcon(iconFactory, list.get(i).getStopname(), list.get(i++).getStopid(), position);
-                                }else {
-                                    addMarker(BitmapDescriptorFactory.HUE_BLUE,destination);
+                                } else {
+                                    addMarker(BitmapDescriptorFactory.HUE_BLUE, position);
                                 }
                             }
                             for (Leg leg : route.getLegList()) {
@@ -167,7 +171,9 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
                 icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(title))).
                 position(position).
                 anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
-        googleMap.addMarker(markerOptions).setTag(text);
+        Marker marker = googleMap.addMarker(markerOptions);
+        marker.setTag(text);
+        marker.setTitle(title);
     }
 
     private void addMarker(float color, LatLng destination) {
@@ -187,12 +193,18 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
             return;
         }
         LatLng currentLocationLatLong = new LatLng(location.getLattitude(), location.getLongitude());
-        if (mMarkerOptions == null || !mMarker.isVisible()) {
-            mMarkerOptions = new MarkerOptions().icon(getCarMapIcon(R.drawable.car_icon)).rotation(bearing).position(currentLocationLatLong);
-            mMarker = googleMap.addMarker(mMarkerOptions);
-        } else if (!mMarker.getPosition().equals(currentLocationLatLong)) {
-            mMarker.setPosition(currentLocationLatLong);
+        if (mMarker != null && !mMarker.getPosition().equals(currentLocationLatLong)) {
+            if (googleMap != null) {
+                googleMap.clear();
+            }
+        }else {
+            if(mMarker != null) {
+                return;
+            }
         }
+        mMarkerOptions = new MarkerOptions().icon(getCarMapIcon(R.drawable.car_icon))/*.rotation(bearing)*/.position(currentLocationLatLong);
+        mMarker = googleMap.addMarker(mMarkerOptions);
+        drawRoute(routestops);
         //setZoomLevel(currentLocationLatLong);
     }
 

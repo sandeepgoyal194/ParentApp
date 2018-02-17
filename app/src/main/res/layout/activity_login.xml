@@ -4,6 +4,7 @@
               android:layout_height="match_parent"
               android:gravity="center_horizontal"
               android:orientation="vertical"
+              android:background="@drawable/background"
               tools:context=".LoginActivity">
 
     <include
