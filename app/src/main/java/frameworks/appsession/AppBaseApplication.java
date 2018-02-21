@@ -51,6 +51,18 @@ public class AppBaseApplication extends Application {
         return mAppSessionManager.getSession();
     }
 
+    public void saveUser(Route user) {
+        mAppUserManager.saveUser(user);
+        mUser = user;
+    }
+
+    public Route getUser() {
+        if (mUser == null) {
+            mUser = mAppUserManager.getUser();
+        }
+        return mUser;
+    }
+
     public void setSession(LoginResponse loginResponse) {
         mAppSessionManager.saveSession(loginResponse);
         mLoginResponse = loginResponse;
@@ -102,4 +114,19 @@ public class AppBaseApplication extends Application {
         return Settings.Secure.getString(getApplication().getContentResolver(),
                 Settings.Secure.ANDROID_ID);
     }
+
+    public boolean isMorningRoute() {
+        return (getUser().getmMorningEvening().equalsIgnoreCase("m"));
+
+    }
+    public boolean isEveningRoute() {
+        return (getUser().getmMorningEvening().equalsIgnoreCase("e"));
+
+    }
+
+/*    public Route getRoute() {
+        Route route = new Route();
+        route.setRouteid(getSession().get().get(0).getRouteid());
+       return return route;
+    }*/
 }

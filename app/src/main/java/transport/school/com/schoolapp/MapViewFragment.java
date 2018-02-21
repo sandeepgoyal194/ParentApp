@@ -34,6 +34,7 @@ import com.google.maps.android.ui.IconGenerator;
 import java.util.ArrayList;
 import java.util.List;
 
+import frameworks.appsession.AppBaseApplication;
 import frameworks.locationmanager.LocationManagerService;
 import frameworks.locationmanager.Locations;
 import frameworks.retrofit.ResponseResolver;
@@ -98,7 +99,21 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
             @Override
             public void onSuccess(StopResponse stopResponse, Response response) {
                 routestops = stopResponse.getRoutestops();
-                drawRoute(routestops);
+                String sequence;
+                if(AppBaseApplication.getApplication().isMorningRoute()) {
+                    sequence = stopResponse.getRoute().getMorningsequence();
+                }else {
+                    sequence = stopResponse.getRoute().getEveningsequence();
+                }
+
+                String[] routes = sequence.split(",");
+
+                List<Routestop> routestopss = new ArrayList<>();
+                for(String route:routes) {
+                    routestopss.add(routestops.get(Integer.parseInt(route)));
+
+                }
+                drawRoute(routestopss);
                 h.postDelayed(locationCHanger, 0);
             }
 
