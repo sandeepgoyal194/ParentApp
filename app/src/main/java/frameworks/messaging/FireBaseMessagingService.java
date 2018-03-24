@@ -14,7 +14,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import transport.school.com.schoolapp.R;
 /**
- * Created by Sandeep on 27/02/2017.
+ * Created by naveen on 27/02/2017.
  */
 
 public class FireBaseMessagingService extends FirebaseMessagingService {

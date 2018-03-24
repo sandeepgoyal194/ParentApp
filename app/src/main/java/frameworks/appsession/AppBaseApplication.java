@@ -11,7 +11,7 @@ import transport.school.com.schoolapp.bean.LoginResponse;
 import transport.school.com.schoolapp.bean.Route;
 import transport.school.com.schoolapp.bean.Student;
 /**
- * Created by Sandeep on 21/01/2017.
+ * Created by naveen on 21/01/2017.
  */
 public class AppBaseApplication extends Application {
     private static AppBaseApplication mApplication;

@@ -1,4 +1,4 @@
-package com.example.sandeep.parentapp;
+package com.example.naveen.parentapp;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
