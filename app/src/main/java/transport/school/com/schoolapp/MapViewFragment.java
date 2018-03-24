@@ -1,4 +1,5 @@
 package transport.school.com.schoolapp;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -49,6 +50,7 @@ import transport.school.com.schoolapp.bean.StopResponse;
 import transport.school.com.schoolapp.bean.Student;
 
 import static transport.school.com.schoolapp.Constants.ZOOM_LEVEL_STREETS;
+
 public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClickListener {
     private static final String TAG = "SchoolApp";
     MapView mMapView;
@@ -100,19 +102,20 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
             public void onSuccess(StopResponse stopResponse, Response response) {
                 routestops = stopResponse.getRoutestops();
                 String sequence;
-                if(AppBaseApplication.getApplication().isMorningRoute()) {
+                if (AppBaseApplication.getApplication().isMorningRoute()) {
                     sequence = stopResponse.getRoute().getMorningsequence();
-                }else {
+                } else {
                     sequence = stopResponse.getRoute().getEveningsequence();
                 }
 
                 String[] routes = sequence.split(",");
 
                 List<Routestop> routestopss = new ArrayList<>();
-                for(String route:routes) {
-                    routestopss.add(routestops.get(Integer.parseInt(route)));
+                for (String route : routes) {
+                    routestopss.add(routestops.get(Integer.parseInt(route) - 1));
 
                 }
+                routestops = routestopss;
                 drawRoute(routestopss);
                 h.postDelayed(locationCHanger, 0);
             }
@@ -122,7 +125,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
             }
         });
     }
-
+    Marker marker;
     public void drawRoute(final List<Routestop> list) {
         final List<LatLng> latLngs = new ArrayList<>();
         for (Routestop routestop : list) {
@@ -140,28 +143,37 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
                     @Override
                     public void onDirectionSuccess(Direction direction, String rawBody) {
                         int i = 0;
+                        if(direction == null) {
+                            return;
+                        }
                         if (direction.isOK()) {
                             LatLng origin = new LatLng(latLngs.get(0).latitude, latLngs.get(0).longitude);
                             com.akexorcist.googledirection.model.Route route = direction.getRouteList().get(0);
-                            if (student.getStopid().equals(list.get(i).getStopid())) {
-                                iconFactory.setColor(Color.GREEN);
-                                addIcon(iconFactory, list.get(i).getStopname(), list.get(i++).getStopid(), origin);
-                            } else {
-                                addMarker(BitmapDescriptorFactory.HUE_GREEN, origin);
+
+
+                            if(student.getStopid().equals(list.get(0).getStopid())) {
+
+                                marker  = addMarker(R.drawable.start_pointer, origin,list.get(i++).getStopname());
+                            }else {
+                                addMarker(R.drawable.start_pointer, origin,"Start Point");
                                 i++;
                             }
-                            if (student.getStopid().equals(list.get(list.size() - 1).getStopid())) {
-                                iconFactory.setColor(Color.RED);
-                                addIcon(iconFactory, list.get(list.size() - 1).getStopname(), list.get(list.size() - 1).getStopid(), destination);
-                            } else {
-                                addMarker(BitmapDescriptorFactory.HUE_RED, destination);
+                            if(student.getStopid().equals(list.get(list.size()-1).getStopid())) {
+
+                                marker = addMarker(R.drawable.last_pointer, destination,list.get(list.size()-1).getStopname());
+                            }else {
+                                addMarker(R.drawable.last_pointer, destination,"End Point");
                             }
+
+
                             for (LatLng position : latLngs.subList(1, list.size() - 1)) {
-                                if (student.getStopid().equals(list.get(i).getStopid())) {
-                                    iconFactory.setColor(Color.BLUE);
-                                    addIcon(iconFactory, list.get(i).getStopname(), list.get(i++).getStopid(), position);
-                                } else {
-                                    addMarker(BitmapDescriptorFactory.HUE_BLUE, position);
+                                String stopName = "";
+                                if(student.getStopid().equals(list.get(i).getStopid())) {
+                                    stopName = list.get(i++).getStopname();
+                                }
+                                Marker marker = addMarker(R.drawable.mid_pointer, position,stopName);
+                                if(stopName != null && !stopName.isEmpty()) {
+                                    MapViewFragment.this.marker = marker;
                                 }
                             }
                             for (Leg leg : route.getLegList()) {
@@ -169,6 +181,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
                                 PolylineOptions polylineOptions = DirectionConverter.createPolyline(getContext(), leg.getDirectionPoint(), 5, Color.RED);
                                 googleMap.addPolyline(polylineOptions);
                             }
+
                             setCameraWithCoordinationBounds(route);
                         } else {
                         }
@@ -191,15 +204,29 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         marker.setTitle(title);
     }
 
-    private void addMarker(float color, LatLng destination) {
-        googleMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(color)).position(destination));
+    private Marker addMarker(int resource, LatLng destination,String title) {
+        return googleMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(resource)).position(destination).title(title));
     }
 
     private void setCameraWithCoordinationBounds(com.akexorcist.googledirection.model.Route route) {
         LatLng southwest = route.getBound().getSouthwestCoordination().getCoordination();
         LatLng northeast = route.getBound().getNortheastCoordination().getCoordination();
         LatLngBounds bounds = new LatLngBounds(southwest, northeast);
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100), new GoogleMap.CancelableCallback() {
+            @Override
+            public void onFinish() {
+                if(marker != null) {
+                    marker.showInfoWindow();
+                }
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        });
+
+
     }
 
     void setLocationOnMap(Locations location, float bearing) {
@@ -212,8 +239,8 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
             if (googleMap != null) {
                 googleMap.clear();
             }
-        }else {
-            if(mMarker != null) {
+        } else {
+            if (mMarker != null) {
                 return;
             }
         }

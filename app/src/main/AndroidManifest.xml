@@ -28,11 +28,13 @@
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:label="Login">
+            android:label="Login"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".MainActivity"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -47,7 +49,8 @@
 
         <activity
             android:name=".StopStudentAttendance"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait">
         </activity>
 
         <service

@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.view.menu.MenuBuilder;
+import android.support.v7.view.menu.MenuItemImpl;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -20,6 +22,7 @@ import frameworks.basemvp.AppBaseActivity;
 import frameworks.basemvp.IPresenter;
 import frameworks.retrofit.ResponseResolver;
 import frameworks.retrofit.RestError;
+import frameworks.retrofit.WebServices;
 import frameworks.retrofit.WebServicesWrapper;
 import retrofit2.Response;
 import transport.school.com.schoolapp.bean.ActiveRouteReply;
@@ -34,7 +37,7 @@ public class MainActivity extends AppBaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Student student = (Student) getIntent().getSerializableExtra("student");
+        Student student = AppBaseApplication.getApplication().getSession().getmStudents().get(0);
         mapFragment = MapViewFragment.newInstance(student);
         super.onCreate(savedInstanceState);
         Route route = new Route();
@@ -70,10 +73,7 @@ public class MainActivity extends AppBaseActivity {
         mMainTab.setupWithViewPager(mViewPager);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
+
 
     @Override
     public int getViewToCreate() {
@@ -137,12 +137,17 @@ public class MainActivity extends AppBaseActivity {
         getMenuInflater().inflate(R.menu.endroute_menu, menu);
         menu.clear();
         List<Student> studentList = AppBaseApplication.getApplication().getStudents();
+        int i =0;
         if(studentList.size()>1) {
-            for (int i = 0; i < studentList.size(); i++) {
+            for (i = 0; i < studentList.size(); i++) {
                 Student student = studentList.get(i);
                 menu.add(0, i, i, student.getStudentname());
             }
         }
+
+
+
+        menu.add(0,100,100,"Logout").setIcon(R.drawable.logout).setShowAsAction(2);
         mapFragment.setStudent(AppBaseApplication.getApplication().getStudents().get(0));
         setTitleValue(AppBaseApplication.getApplication().getStudents().get(0));
         return true;
@@ -152,8 +157,24 @@ public class MainActivity extends AppBaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        mapFragment.setStudent(AppBaseApplication.getApplication().getStudents().get(item.getItemId()));
-        setTitleValue(AppBaseApplication.getApplication().getStudents().get(item.getItemId()));
+        if(item.getItemId() == 100) {
+            WebServicesWrapper.getInstance().logout(AppBaseApplication.getApplication().getSession(), new ResponseResolver<String>() {
+                @Override
+                public void onSuccess(String s, Response response) {
+                    finish();
+                    AppBaseApplication.getApplication().onLogout();
+                }
+
+                @Override
+                public void onFailure(RestError error, String msg) {
+
+                }
+            });
+        }else
+        {
+            mapFragment.setStudent(AppBaseApplication.getApplication().getStudents().get(item.getItemId()));
+            setTitleValue(AppBaseApplication.getApplication().getStudents().get(item.getItemId()));
+        }
         return true;
     }
 
